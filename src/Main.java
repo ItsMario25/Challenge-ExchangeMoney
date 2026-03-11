@@ -9,8 +9,8 @@ public class Main {
 
     private static final String API_KEY = "7b6cf7b9d76ccf6733175f82"; // Reemplaza con tu API key
     private static final String BASE_URL = "https://v6.exchangerate-api.com/v6/";
-    private static HttpClient cliente = HttpClient.newHttpClient();
-    private static Scanner scanner = new Scanner(System.in);
+    private static final HttpClient cliente = HttpClient.newHttpClient();
+    private static final Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
         int opcion;
