@@ -1,18 +1,36 @@
+import java.io.InputStream;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Properties;
 import java.util.Scanner;
 
 public class Main {
 
-    private static final String API_KEY = "7b6cf7b9d76ccf6733175f82"; // Reemplaza con tu API key
-    private static final String BASE_URL = "https://v6.exchangerate-api.com/v6/";
-    private static final HttpClient cliente = HttpClient.newHttpClient();
-    private static final Scanner scanner = new Scanner(System.in);
+    private static String API_KEY;
+    private static String BASE_URL;
+    private static HttpClient cliente;
+    private static Scanner scanner;
 
     public static void main(String[] args) {
+
+        try {
+            // Cargar configuración desde archivo properties
+            if (!cargarConfiguracion()) {
+                System.out.println("❌ No se pudo cargar la configuración.");
+                System.out.println("Asegúrate de crear el archivo 'config.properties' con tu API key.");
+                return;
+            }
+        } finally {
+
+        }
+
+        cliente = HttpClient.newHttpClient();
+        scanner = new Scanner(System.in);
         int opcion;
 
         do {
@@ -42,7 +60,30 @@ public class Main {
 
         scanner.close();
     }
+    private static boolean cargarConfiguracion() {
+        Properties properties = new Properties();
 
+        // Intentar cargar desde el archivo en la raíz del proyecto
+        try (InputStream input = Files.newInputStream(Paths.get("config.properties"))) {
+            properties.load(input);
+            API_KEY = properties.getProperty("api.key");
+            BASE_URL = properties.getProperty("api.url", "https://v6.exchangerate-api.com/v6/");
+
+            if (API_KEY == null || API_KEY.isEmpty() || API_KEY.equals("TU_API_KEY_AQUI")) {
+                System.out.println("❌ API key no configurada correctamente en config.properties");
+                return false;
+            }
+
+            return true;
+
+        } catch (IOException e) {
+            System.out.println("❌ No se encontró el archivo config.properties");
+            System.out.println("📝 Crea el archivo en la raíz del proyecto con el siguiente contenido:");
+            System.out.println("api.key=TU_API_KEY_AQUI");
+            System.out.println("api.url=https://v6.exchangerate-api.com/v6/");
+            return false;
+        }
+    }
     private static void mostrarMenu() {
         System.out.println("\n" + "=".repeat(50));
         System.out.println("   💱 CONSULTOR DE TASAS DE CAMBIO");
